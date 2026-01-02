@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "logical-enchanting",
+	"version": "${version}",
+	"name": "Logical Enchanting",
+	"description": "A new take on Minecraft's enchanting system, specifically focusing on anvil operations.",
+	"authors": [
+		"Moonfall"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/logical-enchanting/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"name.modid.LogicalEnchanting"
+		],
+		"client": [
+			"name.modid.LogicalEnchantingClient"
+		]
+	},
+	"mixins": [
+		"logical-enchanting.mixins.json",
+		{
+			"config": "logical-enchanting.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
