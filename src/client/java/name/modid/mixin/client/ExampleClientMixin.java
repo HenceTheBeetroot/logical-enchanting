@@ -94,6 +94,10 @@ abstract class MainMixin extends ItemCombinerMenu {
 				int primaryEnchantmentLevel = primaryEnchantmentList.getLevel(resultEnchantment);
 				int resultEnchantmentLevel = entry.getIntValue();
 				Enchantment enchantmentData = resultEnchantment.value();
+
+				// add cost dependent on total enchanting
+				totalEnchantCost += getEnchantmentCost(resultEnchantmentLevel, enchantmentData.getMaxLevel());
+
 				if (resultEnchantmentLevel > primaryEnchantmentLevel) {
 					sacrificeToPrimaryEnchantCost += getEnchantmentCost(resultEnchantmentLevel, enchantmentData.getMaxLevel());
 				}
@@ -110,15 +114,11 @@ abstract class MainMixin extends ItemCombinerMenu {
 				}
 			}
 
-			int higherCost = Math.max(primaryToSacrificeEnchantCost, sacrificeToPrimaryEnchantCost);
-			int lowerCost = Math.min(primaryToSacrificeEnchantCost, sacrificeToPrimaryEnchantCost);
+			// base cost is half of total level cost
+			totalEnchantCost = totalEnchantCost / 2 + totalEnchantCost % 2;
 
-			// total cost tends towards cheaper operation, but a powerful tool is still expensive to merge onto
-			totalEnchantCost = lowerCost + higherCost / 2;
-			// costs at least 1 level to repair enchanted tool
-			if (totalEnchantCost < 1 && !resultEnchantmentList.isEmpty()) {
-				totalEnchantCost = 1;
-			}
+			// added cost relates to cheaper operation
+			totalEnchantCost += Math.min(primaryToSacrificeEnchantCost, sacrificeToPrimaryEnchantCost);
 		}
 
 		// if renaming
