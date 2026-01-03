@@ -1,31 +1,38 @@
 package name.modid.mixin.client;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
 @Mixin(AnvilMenu.class)
-abstract class MainMixin extends ItemCombinerMenu {
-
-	public MainMixin(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, ItemCombinerMenuSlotDefinition itemCombinerMenuSlotDefinition) {
+abstract class MenuMixin extends ItemCombinerMenu {
+	public MenuMixin(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, ItemCombinerMenuSlotDefinition itemCombinerMenuSlotDefinition) {
 		super(menuType, i, inventory, containerLevelAccess, itemCombinerMenuSlotDefinition);
 	}
 
@@ -35,7 +42,7 @@ abstract class MainMixin extends ItemCombinerMenu {
 	@Shadow private boolean onlyRenaming;
 	@Shadow public static int calculateIncreasedRepairCost(int i) { return -1; };
 
-	// @Inject before return because this didn't play nice when I tried to @Overwrite it :P
+	// main logic; recalculates exp cost just before anvil output calculation finishes
 	@Inject(method = "createResult", at = @At(value = "RETURN"))
 	private void modifyResult(CallbackInfo ci) {
 		ItemStack primaryItem = this.inputSlots.getItem(0);
@@ -142,6 +149,8 @@ abstract class MainMixin extends ItemCombinerMenu {
 		this.cost.set(totalRepairCost + totalEnchantCost + totalRenameCost);
 		this.broadcastChanges();
 	}
+
+	// removes minimum cost requirement to take items from an anvil
 	@Inject(method = "mayPickup", at = @At(value = "RETURN"), cancellable = true)
 	private void mayPickup(CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(player.hasInfiniteMaterials() || player.experienceLevel >= this.cost.get());
@@ -176,8 +185,15 @@ abstract class MainMixin extends ItemCombinerMenu {
 			)
 	);
 
+	// allows easy lookup from the enchantment map
 	@Unique
 	private int getEnchantmentCost(int level, int maxLevel) {
 		return enchantmentMap.get(maxLevel).get(level);
+	}
+
+	// prevents the level 40 check from running and removing output item
+	@Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;hasInfiniteMaterials()Z"))
+	private boolean disableTooExpensive(Player instance) {
+		return true;
 	}
 }

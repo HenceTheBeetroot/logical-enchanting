@@ -3,7 +3,7 @@
 	"id": "logical-enchanting",
 	"version": "1.0.0",
 	"name": "Logical Enchanting",
-	"description": "A new take on Minecraft's enchanting system, specifically focusing on anvil operations.",
+	"description": "A mod that finally fixes Minecraft's anvil combination system.",
 	"authors": [
 		"HenceTheBeetroot"
 	],
