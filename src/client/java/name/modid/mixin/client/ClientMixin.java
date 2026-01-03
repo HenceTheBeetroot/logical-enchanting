@@ -1,13 +1,8 @@
 package name.modid.mixin.client;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.client.gui.screens.inventory.AnvilScreen;
-import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +12,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jspecify.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
