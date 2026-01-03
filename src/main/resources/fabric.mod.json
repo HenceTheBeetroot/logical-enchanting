@@ -1,11 +1,11 @@
 {
 	"schemaVersion": 1,
 	"id": "logical-enchanting",
-	"version": "${version}",
+	"version": "1.0.0",
 	"name": "Logical Enchanting",
 	"description": "A new take on Minecraft's enchanting system, specifically focusing on anvil operations.",
 	"authors": [
-		"Moonfall"
+		"HenceTheBeetroot"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
