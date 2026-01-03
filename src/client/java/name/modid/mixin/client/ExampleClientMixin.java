@@ -66,7 +66,7 @@ abstract class MenuMixin extends ItemCombinerMenu {
 		// if performing material repair
 		// only costs experience on enchanted tools
 		if (primaryItem.isValidRepairItem(sacrificeItem) && !resultEnchantmentList.isEmpty()) {
-			totalRepairCost = this.repairItemCountCost;
+			totalRepairCost = 1;
 		}
 
 		// if applying from enchanted book (or similar)
