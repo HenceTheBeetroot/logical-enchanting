@@ -1,1 +1,1 @@
-A release version will be added once serverside support is implemented.
+Release versions are available on Modrinth (https://modrinth.com/mod/logical-enchanting).
