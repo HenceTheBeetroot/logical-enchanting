@@ -1,4 +1,4 @@
-package name.modid.mixin.client;
+package name.modid.mixin;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
@@ -36,7 +36,8 @@ abstract class MenuMixin extends ItemCombinerMenu {
 	@Shadow private boolean onlyRenaming;
 	@Shadow public static int calculateIncreasedRepairCost(int i) { return -1; };
 
-	// main logic; recalculates exp cost just before anvil output calculation finishes
+	// main logic
+	// intercepts anvil output function just before it return to modify exp cost
 	@Inject(method = "createResult", at = @At(value = "RETURN"))
 	private void modifyResult(CallbackInfo ci) {
 		ItemStack primaryItem = this.inputSlots.getItem(0);
@@ -49,6 +50,29 @@ abstract class MenuMixin extends ItemCombinerMenu {
 
 		// cancel if anvil operation failed
 		if (resultItem.isEmpty()) {
+			return;
+		}
+
+		// cancels an operation if it is strictly wasteful; i.e.:
+		//   the result is identical to one of the inputs in item type, enchantments, and name
+		//   neither input is damaged
+		if (
+			(
+				primaryItem.is(resultItem.getItem()) &&
+				EnchantmentHelper.getEnchantmentsForCrafting(primaryItem).equals(EnchantmentHelper.getEnchantmentsForCrafting(resultItem)) &&
+				primaryItem.getCustomName() == resultItem.getCustomName() &&
+				!primaryItem.isDamaged() &&
+				!sacrificeItem.isDamaged()
+			)
+			||
+			(
+				sacrificeItem.is(resultItem.getItem()) &&
+				EnchantmentHelper.getEnchantmentsForCrafting(sacrificeItem).equals(EnchantmentHelper.getEnchantmentsForCrafting(resultItem)) &&
+				sacrificeItem.getCustomName() == resultItem.getCustomName()
+			)
+		) {
+			this.resultSlots.setItem(0, ItemStack.EMPTY);
+			this.cost.set(0);
 			return;
 		}
 
@@ -66,7 +90,7 @@ abstract class MenuMixin extends ItemCombinerMenu {
 		// if applying from enchanted book (or similar)
 		if (sacrificeItem.has(DataComponents.STORED_ENCHANTMENTS)) {
 			// calculate enchantments applied from book
-			for(Object2IntMap.Entry<Holder<Enchantment>> entry : EnchantmentHelper.getEnchantmentsForCrafting(sacrificeItem).entrySet()) {
+			for(Object2IntMap.Entry<Holder<Enchantment>> entry : sacrificeEnchantmentList.entrySet()) {
 				Holder<Enchantment> sacrificeEnchantment = entry.getKey();
 				int resultEnchantmentLevel = resultEnchantmentList.getLevel(sacrificeEnchantment);
 				int sacrificeEnchantmentLevel = entry.getIntValue();

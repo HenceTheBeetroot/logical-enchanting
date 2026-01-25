@@ -17,17 +17,10 @@
 	"entrypoints": {
 		"main": [
 			"name.modid.LogicalEnchanting"
-		],
-		"client": [
-			"name.modid.LogicalEnchantingClient"
 		]
 	},
 	"mixins": [
-		"logical-enchanting.mixins.json",
-		{
-			"config": "logical-enchanting.client.mixins.json",
-			"environment": "client"
-		}
+		"logical-enchanting.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
